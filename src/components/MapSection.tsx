@@ -1,7 +1,26 @@
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Map, Navigation, Check } from 'lucide-react';
 
 const MapSection = () => {
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
+
+  const handleMapClick = () => {
+    // Create ripple effect
+    const newRipple = {
+      id: Date.now(),
+      x: Math.random() * 100,
+      y: Math.random() * 100
+    };
+    
+    setRipples(prev => [...prev, newRipple]);
+    
+    // Remove ripple after animation completes
+    setTimeout(() => {
+      setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
+    }, 1000);
+  };
+
   return (
     <section className="py-20 bg-gradient-to-b from-wave-foam to-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,6 +61,7 @@ const MapSection = () => {
 
             <Button 
               size="lg" 
+              onClick={handleMapClick}
               className="bg-water-blue hover:bg-ocean-deep text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
             >
               <Navigation className="w-5 h-5" />
@@ -59,14 +79,31 @@ const MapSection = () => {
                 <div className="text-center">
                   <Map className="w-16 h-16 text-water-blue mx-auto mb-4 animate-float" />
                   <h3 className="text-xl font-semibold text-ocean-deep mb-2">Interactive Map Preview</h3>
-                  <p className="text-muted-foreground">Click "Open Full Map" to explore water stations</p>
+                  <p className="text-muted-foreground">Click "Open Full Map" to see water ripples</p>
                 </div>
               </div>
 
-              {/* Map Points */}
-              <div className="absolute top-1/4 left-1/4 w-4 h-4 bg-water-blue rounded-full animate-ping"></div>
-              <div className="absolute top-3/4 right-1/3 w-4 h-4 bg-water-blue rounded-full animate-ping" style={{ animationDelay: '1s' }}></div>
-              <div className="absolute bottom-1/4 left-2/3 w-4 h-4 bg-water-blue rounded-full animate-ping" style={{ animationDelay: '2s' }}></div>
+              {/* Static Map Points */}
+              <div className="absolute top-1/4 left-1/4 w-3 h-3 bg-water-blue rounded-full shadow-lg"></div>
+              <div className="absolute top-3/4 right-1/3 w-3 h-3 bg-water-blue rounded-full shadow-lg"></div>
+              <div className="absolute bottom-1/4 left-2/3 w-3 h-3 bg-water-blue rounded-full shadow-lg"></div>
+
+              {/* Ripple Effects */}
+              {ripples.map((ripple) => (
+                <div
+                  key={ripple.id}
+                  className="absolute w-4 h-4 pointer-events-none"
+                  style={{
+                    left: `${ripple.x}%`,
+                    top: `${ripple.y}%`,
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                >
+                  <div className="w-full h-full bg-water-blue/40 rounded-full animate-ripple"></div>
+                  <div className="absolute inset-0 w-full h-full bg-water-blue/30 rounded-full animate-ripple" style={{ animationDelay: '0.2s' }}></div>
+                  <div className="absolute inset-0 w-full h-full bg-water-blue/20 rounded-full animate-ripple" style={{ animationDelay: '0.4s' }}></div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
