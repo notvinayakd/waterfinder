@@ -14,9 +14,9 @@ const HeroSection = () => {
       </div>
 
       {/* Floating Water Ripples */}
-      <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-water-light/20 rounded-full animate-ripple"></div>
+      {/* <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-water-light/20 rounded-full animate-ripple"></div>
       <div className="absolute top-1/2 right-1/3 w-24 h-24 bg-water-blue/15 rounded-full animate-ripple" style={{ animationDelay: '1s' }}></div>
-      <div className="absolute bottom-1/3 left-1/2 w-16 h-16 bg-water-light/25 rounded-full animate-ripple" style={{ animationDelay: '2s' }}></div>
+      <div className="absolute bottom-1/3 left-1/2 w-16 h-16 bg-water-light/25 rounded-full animate-ripple" style={{ animationDelay: '2s' }}></div> */}
 
       {/* Hero Content */}
       <div className="relative z-10 text-center max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
