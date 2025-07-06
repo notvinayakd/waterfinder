@@ -8,12 +8,11 @@ import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
 
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import WaterFinderPopup from '@/components/WaterFinderPopup';
 
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
-
-import WaterFinderPopup from '@/components/WaterFinderPopup';
 
 // Fix leaflet marker icon
 delete (L.Icon.Default.prototype as any)._getIconUrl;
@@ -52,16 +51,11 @@ const RoutingControl = ({ destination }: { destination: [number, number] }) => {
       }).addTo(map);
     };
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const userLatLng = L.latLng(pos.coords.latitude, pos.coords.longitude);
-        addRoute(userLatLng);
-      },
-      (err) => {
-        console.error('Geolocation error:', err.message);
-        alert('Could not access your location to show the route.');
-      }
-    );
+    const stored = localStorage.getItem('user-location');
+    if (stored) {
+      const [lat, lng] = stored.split(',').map(Number);
+      addRoute(L.latLng(lat, lng));
+    }
 
     return () => {
       if (control) map.removeControl(control);
@@ -89,14 +83,24 @@ const MapPage = () => {
   }, []);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setUserLocation([pos.coords.latitude, pos.coords.longitude]);
-      },
-      (err) => {
-        console.error('Failed to get location:', err.message);
-      }
-    );
+    const storedLocation = localStorage.getItem('user-location');
+
+    if (storedLocation) {
+      const [lat, lng] = storedLocation.split(',').map(Number);
+      setUserLocation([lat, lng]);
+    } else {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const loc: [number, number] = [pos.coords.latitude, pos.coords.longitude];
+          setUserLocation(loc);
+          localStorage.setItem('user-location', loc.join(','));
+        },
+        (err) => {
+          console.error('Failed to get location:', err.message);
+          alert('Could not access your location.');
+        }
+      );
+    }
   }, []);
 
   return (
@@ -106,6 +110,7 @@ const MapPage = () => {
         <h1 className="text-4xl font-bold text-ocean-deep mb-6 text-center">
           Explore Water Refill Stations
         </h1>
+
         <div className="h-[75vh] rounded-2xl shadow-xl overflow-hidden">
           <MapContainer center={[10, 76]} zoom={6.5} scrollWheelZoom className="h-full w-full z-0">
             <TileLayer
