@@ -1,4 +1,4 @@
-# Website created using Lovable AI and ChatGPT
+# Website created using Lovable AI for frontend and ChatGPT for rest of the functionality and components
 # Used Leaf api for the map component of the website
 # Used Supabase to store the water station data
 
