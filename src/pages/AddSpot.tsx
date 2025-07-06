@@ -1,5 +1,5 @@
 // src/pages/AddSpot.tsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
@@ -8,7 +8,6 @@ import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
-// Fix leaflet marker icon issue
 import markerIcon2x from 'leaflet/dist/images/marker-icon-2x.png';
 import markerIcon from 'leaflet/dist/images/marker-icon.png';
 import markerShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -20,8 +19,7 @@ L.Icon.Default.mergeOptions({
   shadowUrl: markerShadow,
 });
 
-// Mini map click handler
-function LocationPicker({ setLatLng }: { setLatLng: (pos: { lat: number, lng: number }) => void }) {
+function LocationPicker({ setLatLng }: { setLatLng: (pos: { lat: number; lng: number }) => void }) {
   useMapEvents({
     click(e) {
       setLatLng(e.latlng);
@@ -36,6 +34,25 @@ const AddSpot = () => {
   const [latLng, setLatLng] = useState<{ lat: number; lng: number } | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const [search, setSearch] = useState('');
+  const [results, setResults] = useState<any[]>([]);
+
+  // 🔍 Fetch location suggestions when user types
+  useEffect(() => {
+    const delay = setTimeout(async () => {
+      if (search.length > 2) {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(search)}`
+        );
+        const data = await res.json();
+        setResults(data);
+      } else {
+        setResults([]);
+      }
+    }, 500);
+    return () => clearTimeout(delay);
+  }, [search]);
+
   const handleSubmit = async () => {
     if (!name || !description || !latLng) return alert('Please fill all fields and pick a location');
     setLoading(true);
@@ -47,6 +64,8 @@ const AddSpot = () => {
       setName('');
       setDescription('');
       setLatLng(null);
+      setSearch('');
+      setResults([]);
     }
   };
 
@@ -81,8 +100,35 @@ const AddSpot = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-muted-foreground">Location</label>
-              <p className="text-sm text-muted-foreground">Click on the map to select a spot</p>
+              <label className="block text-sm font-medium text-muted-foreground">Search Location</label>
+              <input
+                type="text"
+                className="mt-1 w-full px-4 py-2 border border-muted rounded-lg bg-background text-foreground"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by place name"
+              />
+              {results.length > 0 && (
+                <div className="bg-white border border-border rounded-lg mt-2 max-h-48 overflow-y-auto shadow-lg z-10">
+                  {results.map((place, idx) => (
+                    <div
+                      key={idx}
+                      onClick={() => {
+                        setLatLng({ lat: parseFloat(place.lat), lng: parseFloat(place.lon) });
+                        setSearch(place.display_name);
+                        setResults([]);
+                      }}
+                      className="px-4 py-2 hover:bg-water-blue/10 cursor-pointer text-sm text-foreground"
+                    >
+                      {place.display_name}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-muted-foreground">Or Click on the Map</label>
               {latLng && (
                 <p className="text-sm mt-1 text-water-blue">
                   Lat: {latLng.lat.toFixed(5)}, Lng: {latLng.lng.toFixed(5)}
@@ -110,7 +156,7 @@ const AddSpot = () => {
               className="h-full w-full z-0"
             >
               <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
               <LocationPicker setLatLng={setLatLng} />
@@ -120,7 +166,6 @@ const AddSpot = () => {
         </div>
       </main>
 
-      {/* Footer with spacing */}
       <div className="mt-8">
         <Footer />
       </div>
