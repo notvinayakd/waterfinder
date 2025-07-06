@@ -1,40 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
 
 const Navbar = () => {
-  const [open, setOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <nav className="bg-background shadow-md fixed top-0 left-0 w-full z-50">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        isScrolled
+          ? 'bg-background/80 backdrop-blur-md shadow-lg'
+          : 'bg-transparent'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <div className="text-2xl font-bold text-water-blue">WaterFinder</div>
+        <div className="flex justify-between items-center h-16">
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex gap-8 items-center">
-            <a href="#home" className="text-foreground hover:text-water-blue">Home</a>
-            <a href="#map" className="text-foreground hover:text-water-blue">Map</a>
-            <a href="#add" className="text-foreground hover:text-water-blue">Add Spot</a>
+          {/* Left: Logo */}
+          <div className="flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-water-blue to-water-light rounded-full flex items-center justify-center">
+              <div className="w-4 h-4 bg-white rounded-full animate-float" />
+            </div>
+            <span className="text-xl font-bold text-ocean-deep">WaterFinder</span>
           </div>
 
-          {/* Mobile Hamburger */}
+          {/* Mobile menu button */}
           <div className="md:hidden">
-            <button onClick={() => setOpen(!open)} className="text-water-blue focus:outline-none">
-              {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            <button onClick={() => setMenuOpen(!menuOpen)} className="text-water-blue focus:outline-none">
+              {menuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
           </div>
-        </div>
-      </div>
 
-      {/* Mobile Dropdown Menu */}
-      {open && (
-        <div className="md:hidden bg-background px-4 pb-4">
-          <a href="#home" className="block py-2 text-foreground hover:text-water-blue">Home</a>
-          <a href="#map" className="block py-2 text-foreground hover:text-water-blue">Map</a>
-          <a href="#add" className="block py-2 text-foreground hover:text-water-blue">Add Spot</a>
+          {/* Center Links for Desktop */}
+          <div className="hidden md:flex absolute left-1/2 transform -translate-x-1/2 space-x-8">
+            <Link
+              to="/"
+              className="text-foreground hover:text-water-blue transition-colors duration-200"
+            >
+              Home
+            </Link>
+            <Link
+              to="/add-spot"
+              className="text-foreground hover:text-water-blue transition-colors duration-200"
+            >
+              Add Spot
+            </Link>
+          </div>
         </div>
-      )}
+
+        {/* Mobile dropdown */}
+        {menuOpen && (
+          <div className="md:hidden mt-2 bg-background/90 backdrop-blur-md rounded-xl px-4 py-3 text-center shadow-lg space-y-2">
+            <Link
+              to="/"
+              onClick={() => setMenuOpen(false)}
+              className="block text-foreground hover:text-water-blue transition-colors duration-200"
+            >
+              Home
+            </Link>
+            <Link
+              to="/add-spot"
+              onClick={() => setMenuOpen(false)}
+              className="block text-foreground hover:text-water-blue transition-colors duration-200"
+            >
+              Add Spot
+            </Link>
+          </div>
+        )}
+      </div>
     </nav>
   );
 };
