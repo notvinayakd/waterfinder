@@ -23,13 +23,13 @@ const Navbar = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex justify-between items-center">
 
-          {/* Left: Logo */}
-          <div className="flex items-center space-x-2">
+          {/* Left: Logo (Now clickable to go home) */}
+          <Link to="/" className="flex items-center space-x-2 cursor-pointer">
             <div className="w-8 h-8 bg-gradient-to-br from-water-blue to-water-light rounded-full flex items-center justify-center">
               <div className="w-4 h-4 bg-white rounded-full animate-float" />
             </div>
             <span className="text-xl font-bold text-ocean-deep">WaterFinder</span>
-          </div>
+          </Link>
 
           {/* Mobile menu button */}
           <div className="md:hidden">
