@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Map as MapIcon, Navigation, Check } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { useNavigate } from 'react-router-dom';
 import L from 'leaflet';
+import { Check, Navigation } from 'lucide-react';
 import 'leaflet/dist/leaflet.css';
 
 // Fix Leaflet marker issue
@@ -10,25 +10,16 @@ delete (L.Icon.Default.prototype as any)._getIconUrl;
 L.Icon.Default.mergeOptions({
   iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon-2x.png',
   iconUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-icon.png',
-  shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png'
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.3/dist/images/marker-shadow.png',
 });
 
 const MapSection = () => {
   const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const [position, setPosition] = useState<[number, number] | null>(null);
+  const navigate = useNavigate();
 
   const handleMapClick = () => {
-    const newRipple = {
-      id: Date.now(),
-      x: Math.random() * 100,
-      y: Math.random() * 100
-    };
-
-    setRipples(prev => [...prev, newRipple]);
-
-    setTimeout(() => {
-      setRipples(prev => prev.filter(ripple => ripple.id !== newRipple.id));
-    }, 1000);
+    navigate('/map');
   };
 
   useEffect(() => {
@@ -37,21 +28,20 @@ const MapSection = () => {
         (pos) => {
           setPosition([pos.coords.latitude, pos.coords.longitude]);
         },
-        (err) => {
-          console.error('Geolocation error:', err);
+        () => {
           setPosition([9.9312, 76.2673]); // Fallback to Kochi
         }
       );
     } else {
-      setPosition([9.9312, 76.2673]); // Geolocation not supported
+      setPosition([9.9312, 76.2673]);
     }
   }, []);
 
   return (
-    <section className="py-20 bg-gradient-to-b from-wave-foam to-background">
+    <section className="py-24 bg-gradient-to-b from-wave-foam to-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Left side same as before */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+          {/* Left Side */}
           <div className="animate-fade-in">
             <h2 className="text-4xl sm:text-5xl font-bold text-ocean-deep mb-6">
               Explore the
@@ -65,7 +55,7 @@ const MapSection = () => {
               Filter by amenities, ratings, and distance to find the perfect spot for your needs.
             </p>
 
-            <div className="space-y-4 mb-8">
+            <div className="space-y-4 mb-10">
               {[
                 "Real-time availability updates",
                 "User reviews and ratings",
@@ -80,17 +70,38 @@ const MapSection = () => {
               ))}
             </div>
 
-            <Button
-              size="lg"
+            {/* 💧 Hero-style animated button */}
+            <button
               onClick={handleMapClick}
-              className="bg-water-blue hover:bg-ocean-deep text-white px-8 py-4 text-lg font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 flex items-center gap-2"
+              className="relative group/btn overflow-hidden px-8 py-4 text-lg font-semibold border-2 border-water-blue text-white rounded-2xl transition-all duration-300 bg-water-blue hover:bg-gradient-to-r hover:from-blue-700 hover:to-cyan-600 shadow-xl flex items-center gap-2"
             >
-              <Navigation className="w-5 h-5" />
-              Open Full Map
-            </Button>
+              {/* ✨ Shine */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 translate-x-[-100%] group-hover/btn:translate-x-[100%] transition-transform duration-1000 z-10 pointer-events-none"></div>
+
+              {/* 🌊 Ripple */}
+              <span className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
+                <span className="absolute top-1/2 left-1/2 w-0 h-0 bg-white/20 rounded-full group-hover/btn:animate-water-ripple"></span>
+              </span>
+
+              {/* Label */}
+              <span className="relative z-20 tracking-wide flex items-center gap-2">
+                <Navigation className="w-5 h-5" /> Open Full Map
+              </span>
+
+              {/* 💡 Glow */}
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-400/50 to-cyan-400/50 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300 blur-md z-0"></div>
+
+              {/* 🩵 Bottom line effects */}
+              <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-400/60 to-transparent"></div>
+              <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-16 h-px bg-gradient-to-r from-blue-500/90 to-cyan-400/90 blur-sm"></div>
+
+              {/* 🌟 Flares */}
+              <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-bl from-white/20 to-transparent rounded-3xl z-0"></div>
+              <div className="absolute bottom-0 left-0 w-12 h-12 bg-gradient-to-tr from-blue-500/15 to-transparent rounded-3xl z-0"></div>
+            </button>
           </div>
 
-          {/* Right side: Dynamic map */}
+          {/* Right Side - Mini Map */}
           <div className="animate-slide-up">
             <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl z-0">
               {position ? (
@@ -107,7 +118,7 @@ const MapSection = () => {
                   <Marker position={position}>
                     <Popup>
                       You're here! 🌍<br />
-                      Latitude: {position[0].toFixed(4)}, Longitude: {position[1].toFixed(4)}
+                      Lat: {position[0].toFixed(4)}, Lng: {position[1].toFixed(4)}
                     </Popup>
                   </Marker>
                 </MapContainer>
@@ -117,7 +128,7 @@ const MapSection = () => {
                 </div>
               )}
 
-              {/* Ripples */}
+              {/* 💦 Optional ripple visuals */}
               {ripples.map((ripple) => (
                 <div
                   key={ripple.id}

@@ -5,6 +5,9 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AddSpot from "./pages/AddSpot";
+import MapPage from './pages/MapPage';
+import ScrollToTop from '@/components/scrolltotop';
 
 const queryClient = new QueryClient();
 
@@ -16,8 +19,9 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="/add-spot" element={<AddSpot />} />
           <Route path="*" element={<NotFound />} />
+          <Route path="/map" element={<MapPage />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

@@ -5,6 +5,8 @@ import FeaturesSection from '@/components/FeaturesSection';
 import HowItWorksSection from '@/components/HowItWorksSection';
 import MapSection from '@/components/MapSection';
 import Footer from '@/components/Footer';
+import AddSpotSection from '@/pages/AddSpot';
+
 
 const Index = () => {
   useEffect(() => {
