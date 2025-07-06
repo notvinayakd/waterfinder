@@ -1,4 +1,6 @@
 # Website created using Lovable AI and ChatGPT
+# Used Leaf api for the map component of the website
+# Used Supabase to store the water station data
 
 # To Run the website
 
@@ -15,5 +17,8 @@ npm i
 # Step 4: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
+
+
+
 
 
