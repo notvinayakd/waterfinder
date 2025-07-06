@@ -18,7 +18,7 @@ const HeroSection = () => {
   return (
     <section
       id="home"
-      className={`relative min-h-screen flex items-center justify-center overflow-hidden transition-opacity duration-500 ${
+      className={`relative min-h-screen pt-20 flex items-center justify-center overflow-hidden transition-opacity duration-500 ${
         isExiting ? 'opacity-0' : 'opacity-100'
       }`}
     >
